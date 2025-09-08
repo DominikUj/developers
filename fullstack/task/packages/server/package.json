@@ -6,7 +6,7 @@
     "license": "UNLICENSED",
     "scripts": {
         "build": "nest build",
-        "serve": "node dist/main"
+        "serve": "docker compose up & node dist/main"
     },
     "dependencies": {
         "@nestjs/apollo": "10.1.3",

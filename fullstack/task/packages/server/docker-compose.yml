@@ -1,0 +1,18 @@
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: postgres_dev
+    ports:
+      - "${DB_PORT:-5430}:5432"
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    env_file:
+      - .env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
