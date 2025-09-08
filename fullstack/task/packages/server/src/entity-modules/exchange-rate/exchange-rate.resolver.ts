@@ -6,8 +6,8 @@ import { ExchangeRate } from '../../entities';
 export class ExchangeRateResolver {
     constructor(private readonly exchangeRateService: ExchangeRateService) {}
 
-    @Query(() => ExchangeRate)
+    @Query(() => [ExchangeRate])
     async exchangeRates(): Promise<ExchangeRate[]> {
-        return this.exchangeRateService.getExchangeRates();
+        return await this.exchangeRateService.getExchangeRates();
     }
 }

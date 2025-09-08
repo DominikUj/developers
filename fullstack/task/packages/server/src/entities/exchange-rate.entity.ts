@@ -1,18 +1,13 @@
 import { Field, Float, ObjectType, Int } from '@nestjs/graphql';
 import { IsString, IsNumber, IsDate, IsPositive } from 'class-validator';
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
-import { EntityWithMeta } from '../common';
+import { Column, Entity, Unique } from 'typeorm';
+import { EntityWithMeta } from '../common/entities/entity-with-meta';
 import { VAR_CHAR } from './constants';
 
 @ObjectType()
 @Entity()
 @Unique(['currencyCode', 'validFor'])
 export class ExchangeRate extends EntityWithMeta {
-
-    @IsString()
-    @Field(() => String)
-    @PrimaryGeneratedColumn('uuid')
-    public id!: string;
 
     @IsString()
     @Field(() => String)

@@ -11,7 +11,7 @@ export class ExchangeRateService {
         
         const mockRates: ExchangeRate[] = [
             {
-                id: '12',
+                id: '70434563-a16b-454a-bfd4-d9d03300d771',
                 country: 'USA',
                 currency: 'dollar',
                 amount: 1,
@@ -24,7 +24,7 @@ export class ExchangeRateService {
                 version: 1
             },
             {
-                id: '13',
+                id: '57b18801-153f-4fc5-9007-f3bc041bbc0f',
                 country: 'EMU',
                 currency: 'euro',
                 amount: 1,
@@ -38,6 +38,8 @@ export class ExchangeRateService {
             },
            
         ];
+
+        console.log("MOCK RATES", mockRates)
 
         return mockRates;
     };
