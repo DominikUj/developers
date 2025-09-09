@@ -3,10 +3,12 @@ import { GET_EXCHANGE_RATES } from '../queries/exchangeRates';
 
 export interface ExchangeRate {
     id: string;
-    fromCurrency: string;
-    toCurrency: string;
     rate: number;
-    timestamp: string;
+    fetchedAt: Date;
+    currencyCode: string;
+    currency: string;
+    country: string;
+    amount: number;
 }
 
 export const useExchangeRates = () => {
@@ -19,5 +21,6 @@ export const useExchangeRates = () => {
         loading,
         error,
         refetch,
+        fetchedAt: data?.exchangeRates[0].fetchedAt || null,
     };
 };

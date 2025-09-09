@@ -1,49 +1,28 @@
-import React from 'react';
-import { useExchangeRates } from '../hooks/useExchangeRates';
+import ExchangeRatesTable from '../components/ExchangeRatesTable';
+import LastDataUpdateIndicator from '../components/LastDataUpdateIndicator';
+import RefetchButton from '../components/RefetchButton';
+import ThemeSelect from '../components/ThemeSelect';
 
 const Dashboard = () => {
-    const { exchangeRates, loading, error } = useExchangeRates();
-
-    if (loading) return <div className="loading loading-spinner loading-lg" />;
-    if (error) return <div className="alert alert-error">Error: {error.message}</div>;
-
-    const fetchedAt = exchangeRates.length > 0 ? new Date(exchangeRates[0].fetchedAt) : null;
-
     return (
-        <div className="container mx-auto p-4">
-            <div className="w-full flex justify-between">
-                <h1 className="text-2xl font-bold mb-4">Kurzy měn</h1>
-                {fetchedAt && (
-                    <div className="w-fit px-4 py-2 card bg-base-100 shadow-sm">
-                        <p className="text-sm text-gray-600 flex items-center justify-center h-full">
-                            Poslední aktualizace: {fetchedAt.toLocaleString()}
+        <div className="min-h-screen bg-base-200">
+            <div className="container mx-auto p-6 max-w-7xl">
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+                    <div>
+                        <h1 className="text-4xl font-bold text-base-content">Kurzy měn</h1>
+                        <p className="text-base-content/70 mt-1">
+                            Aktuální směnné kurzy české koruny
                         </p>
                     </div>
-                )}
-            </div>
-            <div className="overflow-x-auto card shadow-sm ">
-                <table className="table table-zebra w-full ">
-                    <thead>
-                        <tr>
-                            <th>Měna</th>
-                            <th>Kód měny</th>
-                            <th>Kurz</th>
-                            <th>Částka</th>
-                            <th>Země</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {exchangeRates.map((rate) => (
-                            <tr key={rate.id}>
-                                <td>{rate.currency}</td>
-                                <td>{rate.currencyCode}</td>
-                                <td>{rate.rate}</td>
-                                <td>{rate.amount}</td>
-                                <td>{rate.country}</td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
+
+                    <div className="grid grid-cols-1 md:grid-cols-[60%_40%] gap-3 items-start sm:items-center w-full">
+                        <ThemeSelect />
+                        <RefetchButton />
+                        <LastDataUpdateIndicator />
+                    </div>
+                </div>
+
+                <ExchangeRatesTable />
             </div>
         </div>
     );
