@@ -7,7 +7,7 @@ import { ExchangeRate } from '../../entities/exchange-rate.entity';
 
 @Injectable()
 export class ExchangeRateService {
-    private readonly CACHE_TTL_MINUTES = 5;
+    private readonly CACHE_TTL_MINUTES = 1;
     private readonly CNB_API_URL = 'https://api.cnb.cz/cnbapi/exrates/daily';
 
     constructor(
@@ -28,6 +28,7 @@ export class ExchangeRateService {
             });
 
         if (isValidCache) {
+            console.log('Returning cached exchange rates');
             return cachedRates;
         }
 
@@ -36,6 +37,7 @@ export class ExchangeRateService {
         await this.exchangeRateRepository.clear();
         await this.exchangeRateRepository.save(freshRates);
         
+        console.log('Returning fresh exchange rates from CNB API');
         return freshRates;
     };
 
@@ -51,16 +53,17 @@ export class ExchangeRateService {
             const currentDate = new Date();
             const rates: ExchangeRate[] = [];
 
-            const parseResult = exRateDailyRestResponseSchema.safeParse(apiData.rates)
+            const parseResult = exRateDailyRestResponseSchema.safeParse(apiData)
             if(parseResult.error) {
                 console.error('Schema validation error:', parseResult.error);
                 throw new Error('Invalid API response schema');
             }
 
             const validatedRates = parseResult.data;
+            const fetchedAt = new Date()
 
             validatedRates.rates.forEach(async (rate) => {
-                const _rate = await this.exchangeRateRepository.create(rate);
+                const _rate = await this.exchangeRateRepository.create({...rate, fetchedAt, updatedAtUtc: fetchedAt.toISOString(), createdAtUtc: fetchedAt.toISOString() });
                 rates.push(_rate);
             })
 
