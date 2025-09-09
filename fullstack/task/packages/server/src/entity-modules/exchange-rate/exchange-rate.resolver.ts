@@ -1,6 +1,6 @@
 import { Query, Resolver } from '@nestjs/graphql';
+import { ExchangeRate } from '../../entities/exchange-rate.entity';
 import { ExchangeRateService } from './exchange-rate.service';
-import { ExchangeRate } from '../../entities';
 
 @Resolver()
 export class ExchangeRateResolver {

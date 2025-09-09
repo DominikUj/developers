@@ -1,46 +1,75 @@
 import { Injectable } from '@nestjs/common';
-import { ExchangeRate } from '../../entities';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import axios from 'axios';
+import { exRateDailyRestResponseSchema } from './schemas/rate';
+import { ExchangeRate } from '../../entities/exchange-rate.entity';
 
 @Injectable()
 export class ExchangeRateService {
+    private readonly CACHE_TTL_MINUTES = 5;
+    private readonly CNB_API_URL = 'https://api.cnb.cz/cnbapi/exrates/daily';
 
-    // TODO: replace with real dat fetch
+    constructor(
+        @InjectRepository(ExchangeRate)
+        private readonly exchangeRateRepository: Repository<ExchangeRate>,
+    ) {}
+
     public getExchangeRates = async (): Promise<ExchangeRate[]> => {
-        const currentDate = new Date();
-        const validForDate = new Date();
+        const cachedRates = await this.exchangeRateRepository.find({
+            order: { currencyCode: 'ASC' }
+        });
+
+        const now = new Date();
+        const isValidCache = cachedRates.length > 0 && 
+            cachedRates.some(rate => {
+                const ageInMinutes = (now.getTime() - rate.fetchedAt.getTime()) / (1000 * 60);
+                return ageInMinutes < this.CACHE_TTL_MINUTES;
+            });
+
+        if (isValidCache) {
+            return cachedRates;
+        }
+
+        const freshRates = await this.fetchFromCNBApi();
         
-        const mockRates: ExchangeRate[] = [
-            {
-                id: '70434563-a16b-454a-bfd4-d9d03300d771',
-                country: 'USA',
-                currency: 'dollar',
-                amount: 1,
-                currencyCode: 'USD',
-                rate: 23.45,
-                validFor: validForDate,
-                fetchedAt: currentDate,
-                createdAtUtc: new Date(),
-                updatedAtUtc: new Date(),
-                version: 1
-            },
-            {
-                id: '57b18801-153f-4fc5-9007-f3bc041bbc0f',
-                country: 'EMU',
-                currency: 'euro',
-                amount: 1,
-                currencyCode: 'EUR',
-                rate: 25.67,
-                validFor: validForDate,
-                fetchedAt: currentDate,
-                createdAtUtc: new Date(),
-                updatedAtUtc: new Date(),
-                version: 1
-            },
-           
-        ];
-
-        console.log("MOCK RATES", mockRates)
-
-        return mockRates;
+        await this.exchangeRateRepository.clear();
+        await this.exchangeRateRepository.save(freshRates);
+        
+        return freshRates;
     };
+
+    private async fetchFromCNBApi(): Promise<ExchangeRate[]> {
+        try {
+            const response = await axios.get(this.CNB_API_URL);
+            const apiData = response.data;
+            
+            if (!apiData.rates || !Array.isArray(apiData.rates)) {
+                throw new Error('Invalid API response format');
+            }
+
+            const currentDate = new Date();
+            const rates: ExchangeRate[] = [];
+
+            const parseResult = exRateDailyRestResponseSchema.safeParse(apiData.rates)
+            if(parseResult.error) {
+                console.error('Schema validation error:', parseResult.error);
+                throw new Error('Invalid API response schema');
+            }
+
+            const validatedRates = parseResult.data;
+
+            validatedRates.rates.forEach(async (rate) => {
+                const _rate = await this.exchangeRateRepository.create(rate);
+                rates.push(_rate);
+            })
+
+
+            return rates;
+        } catch (error) {
+            console.error('Failed to fetch exchange rates from CNB API:', error);
+            throw new Error('Failed to fetch exchange rates');
+        }
+    }
+
 }

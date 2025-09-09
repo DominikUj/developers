@@ -8,7 +8,8 @@
         "server": "yarn nx run --project server",
         "client": "yarn nx run --project client",
         "codecheck": "yarn nx run-many --target codecheck --all",
-        "codecheck:fix": "yarn nx run-many --target codecheck --configuration fix --all"
+        "codecheck:fix": "yarn nx run-many --target codecheck --configuration fix --all",
+        "migration:create": "yarn nx run server:migration:create --name"
     },
     "dependencies": {
         "@types/jest": "28.1.8",
@@ -18,7 +19,7 @@
         "react-router": "^7.8.2",
         "ts-jest": "28.0.8",
         "ts-node": "^10.9.1",
-        "typescript": "4.7.4",
+        "typescript": "^5.9.2",
         "yarn": "^1.22.22"
     },
     "devDependencies": {
