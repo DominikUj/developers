@@ -5,7 +5,7 @@ export interface ExchangeRate {
   id: string;
   fromCurrency: string;
   toCurrency: string;
-  rate: number;
+  rate: number
   timestamp: string;
 }
 

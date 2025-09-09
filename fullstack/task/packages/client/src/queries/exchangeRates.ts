@@ -6,6 +6,9 @@ export const GET_EXCHANGE_RATES = gql`
       id
       currency
       rate
+      currencyCode
+      amount
+      country
     }
   }
 `;
