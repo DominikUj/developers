@@ -1,8 +1,11 @@
-import React from 'react';
-import { useExchangeRates } from '../hooks/useExchangeRates';
+import { PaginationInput, usePaginatedExchangeRates } from '../hooks/useExchangeRates';
 
-const ExchangeRatesTable = () => {
-    const { exchangeRates, loading, refetch } = useExchangeRates();
+interface ExchangeRatesTableProps {
+    pagination?: PaginationInput;
+}
+
+const ExchangeRatesTable = ({ pagination }: ExchangeRatesTableProps) => {
+    const { exchangeRates, loading } = usePaginatedExchangeRates(pagination);
 
     if (loading) {
         return (

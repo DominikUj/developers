@@ -1,9 +1,19 @@
+import { useState } from 'react';
 import ExchangeRatesTable from '../components/ExchangeRatesTable';
 import LastDataUpdateIndicator from '../components/LastDataUpdateIndicator';
 import RefetchButton from '../components/RefetchButton';
 import ThemeSelect from '../components/ThemeSelect';
+import PaginationControls from '../components/PaginationControls';
+import { PaginationInput, usePaginatedExchangeRates } from '../hooks/useExchangeRates';
 
 const Dashboard = () => {
+    const [pagination, setPagination] = useState<PaginationInput>({
+        limit: 20,
+        offset: 0,
+    });
+
+    const { pagination: paginationInfo, loading } = usePaginatedExchangeRates(pagination);
+
     return (
         <div className="min-h-screen bg-base-200">
             <div className="container mx-auto p-6 max-w-7xl">
@@ -16,13 +26,23 @@ const Dashboard = () => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-[60%_40%] gap-3 items-start sm:items-center w-full">
-                        <ThemeSelect />
+                        <div className="flex justify-end items-center max-md:flex-col gap-4">
+                            Motiv:
+                            <ThemeSelect />
+                        </div>
                         <RefetchButton />
                         <LastDataUpdateIndicator />
                     </div>
                 </div>
 
-                <ExchangeRatesTable />
+                <ExchangeRatesTable pagination={pagination} />
+
+                <PaginationControls
+                    pagination={paginationInfo}
+                    currentPagination={pagination}
+                    onPageChange={setPagination}
+                    loading={loading}
+                />
             </div>
         </div>
     );

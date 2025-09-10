@@ -2,6 +2,23 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type PaginationInfo {
+  """Total number of items"""
+  totalCount: Int!
+
+  """Number of items returned in this response"""
+  count: Int!
+
+  """Current offset"""
+  offset: Int!
+
+  """Current limit"""
+  limit: Int!
+
+  """Whether there are more items available"""
+  hasMore: Boolean!
+}
+
 type Example {
   id: ID!
   createdAtUtc: DateTime!
@@ -32,9 +49,26 @@ type ExchangeRate {
   fetchedAt: DateTime!
 }
 
+type PaginatedExchangeRatesResponse {
+  """List of items"""
+  items: [ExchangeRate!]!
+
+  """Pagination information"""
+  pagination: PaginationInfo!
+}
+
 type Query {
   exampleByName(name: String!): Example
   exchangeRates: [ExchangeRate!]!
+  paginatedExchangeRates(pagination: PaginationInput): PaginatedExchangeRatesResponse!
+}
+
+input PaginationInput {
+  """Number of items to return (max 100)"""
+  limit: Int = 10
+
+  """Number of items to skip"""
+  offset: Int = 0
 }
 
 type Mutation {

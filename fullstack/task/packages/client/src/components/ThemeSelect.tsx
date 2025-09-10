@@ -28,7 +28,7 @@ const ThemeSelect = () => {
     const context = useContext(ThemeContext.Context);
 
     return (
-        <div className="dropdown w-full flex md:justify-end">
+        <div className="dropdown max-md:w-full flex md:justify-end items-center">
             <div tabIndex={0} role="button" className="btn m-1 max-sm:w-full">
                 {context.theme.charAt(0).toUpperCase() + context.theme.slice(1)}
                 <svg
