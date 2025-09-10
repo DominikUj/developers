@@ -17,7 +17,7 @@
             "executor": "nx:run-script",
             "options": {
                 "cwd": "packages/server",
-                "script": "serve"
+                "script": "docker compose up & serve"
             }
         },
         "start": {
@@ -27,13 +27,14 @@
                 "command": "yarn nest start --debug 0.0.0.0 --watch"
             }
         },
-        "db-create": {
+        "db-and-start": {
             "executor": "nx:run-commands",
             "options": {
                 "cwd": "packages/server",
-                "command": "sh ./scripts/db-create.sh"
+                "command": "docker compose up & yarn nest start --debug 0.0.0.0 --watch"
             }
         },
+
         "migration": {
             "executor": "nx:run-commands",
             "options": {
