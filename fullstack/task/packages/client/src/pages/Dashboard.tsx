@@ -24,15 +24,22 @@ const Dashboard = () => {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-[50%_50%] gap-3 items-start sm:items-center w-full">
-                        <div className="flex justify-end items-center max-md:flex-col gap-4">
-                            <LocalizedText transKey="theme" />
-
-                            <ThemeSelect />
+                    <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center max-md:w-full">
+                        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center max-md:w-full">
+                            <div className="flex items-center gap-2 max-md:w-full max-md:flex">
+                                <LocalizedText transKey="theme" />
+                                <ThemeSelect />
+                            </div>
+                            <div className="flex items-center gap-2 max-md:w-full max-md:flex">
+                                <LocalizedText transKey="language" />
+                                <LanguageSelect />
+                            </div>
                         </div>
-                        <LanguageSelect />
-                        <RefetchButton />
-                        <LastDataUpdateIndicator />
+
+                        <div className="flex flex-col sm:flex-row gap-3 lg:ml-auto items-center max-md:w-full">
+                            <RefetchButton />
+                            <LastDataUpdateIndicator />
+                        </div>
                     </div>
                 </div>
 

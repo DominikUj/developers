@@ -42,6 +42,7 @@ const cs = {
 
     czech: 'Čeština🇨🇿',
     english: 'Angličtina🇬🇧',
+    language: 'Jazyk',
 } as const;
 
 type Translations = typeof cs;
@@ -100,6 +101,7 @@ const translations: Record<Locale, Record<keyof Translations, string>> = {
         close: 'Close',
         czech: 'Czech🇨🇿',
         english: 'English🇬🇧',
+        language: 'Language',
     },
 };
 

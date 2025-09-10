@@ -9,7 +9,7 @@ const RefetchButton = () => {
             type="button"
             disabled={loading}
             onClick={() => refetch()}
-            className="btn btn-primary gap-2 max-sm:w-full"
+            className="btn btn-primary gap-2 max-sm:w-full flex justify-center items-center"
         >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path
