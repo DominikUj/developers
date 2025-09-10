@@ -5,6 +5,7 @@ import { RouterProvider } from 'react-router';
 import ThemeContext from './context/ThemeContext';
 import router from './routing/Router';
 import './style.css';
+import ExchangeRatesContext from './context/ExchangeRatesContext';
 
 const client = new ApolloClient({
     uri: 'http://localhost:4000/graphql',
@@ -21,7 +22,9 @@ ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
     <React.StrictMode>
         <ApolloProvider client={client}>
             <ThemeContext.ContextProvider>
-                <RouterProvider router={router} />
+                <ExchangeRatesContext.ContextProvider>
+                    <RouterProvider router={router} />
+                </ExchangeRatesContext.ContextProvider>
             </ThemeContext.ContextProvider>
         </ApolloProvider>
     </React.StrictMode>

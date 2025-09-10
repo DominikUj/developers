@@ -1,12 +1,11 @@
-import {createBrowserRouter} from 'react-router'
-import React from 'react'
-import Dashboard from '../pages/Dashboard'
+import { createBrowserRouter } from 'react-router';
+import Dashboard from '../pages/Dashboard';
 
 const router = createBrowserRouter([
     {
         path: '/',
-        Component: Dashboard
-    }
-])
+        Component: Dashboard,
+    },
+]);
 
-export default router
+export default router;

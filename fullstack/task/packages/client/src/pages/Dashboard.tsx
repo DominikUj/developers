@@ -1,18 +1,13 @@
-import { useState } from 'react';
+import { useContext } from 'react';
 import ExchangeRatesTable from '../components/ExchangeRatesTable';
 import LastDataUpdateIndicator from '../components/LastDataUpdateIndicator';
+import PaginationControls from '../components/PaginationControls';
 import RefetchButton from '../components/RefetchButton';
 import ThemeSelect from '../components/ThemeSelect';
-import PaginationControls from '../components/PaginationControls';
-import { PaginationInput, usePaginatedExchangeRates } from '../hooks/useExchangeRates';
+import ExchangeRatesContext from '../context/ExchangeRatesContext';
 
 const Dashboard = () => {
-    const [pagination, setPagination] = useState<PaginationInput>({
-        limit: 20,
-        offset: 0,
-    });
-
-    const { pagination: paginationInfo, loading } = usePaginatedExchangeRates(pagination);
+    const context = useContext(ExchangeRatesContext.Context);
 
     return (
         <div className="min-h-screen bg-base-200">
@@ -35,13 +30,13 @@ const Dashboard = () => {
                     </div>
                 </div>
 
-                <ExchangeRatesTable pagination={pagination} />
+                <ExchangeRatesTable pagination={context.pagination} />
 
                 <PaginationControls
-                    pagination={paginationInfo}
-                    currentPagination={pagination}
-                    onPageChange={setPagination}
-                    loading={loading}
+                    pagination={context.paginationInfo}
+                    currentPagination={context.pagination}
+                    onPageChange={context.setPagination}
+                    loading={context.loading}
                 />
             </div>
         </div>
