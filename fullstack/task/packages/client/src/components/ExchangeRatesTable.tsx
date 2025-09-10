@@ -1,10 +1,9 @@
-import { PaginationInput, usePaginatedExchangeRates } from '../hooks/useExchangeRates';
+import { usePaginatedExchangeRates } from '../hooks/useExchangeRates';
+import { usePagination } from '../hooks/usePagination';
+import LocalizedText from './LocalizedText';
 
-interface ExchangeRatesTableProps {
-    pagination?: PaginationInput;
-}
-
-const ExchangeRatesTable = ({ pagination }: ExchangeRatesTableProps) => {
+const ExchangeRatesTable = () => {
+    const { pagination } = usePagination();
     const { exchangeRates, loading } = usePaginatedExchangeRates(pagination);
 
     if (loading) {
@@ -18,7 +17,9 @@ const ExchangeRatesTable = ({ pagination }: ExchangeRatesTableProps) => {
     if (exchangeRates.length === 0) {
         return (
             <div className="text-center py-12">
-                <div className="text-base-content/40 text-lg">Žádná data nejsou k dispozici</div>
+                <div className="text-base-content/40 text-lg">
+                    <LocalizedText transKey="noData" />
+                </div>
             </div>
         );
     }
@@ -30,11 +31,21 @@ const ExchangeRatesTable = ({ pagination }: ExchangeRatesTableProps) => {
                     <table className="table table-zebra w-full">
                         <thead className="bg-base-200">
                             <tr>
-                                <th className="font-bold text-base-content">Měna</th>
-                                <th className="font-bold text-base-content">Kód měny</th>
-                                <th className="font-bold text-base-content text-right">Kurz</th>
-                                <th className="font-bold text-base-content text-right">Částka</th>
-                                <th className="font-bold text-base-content">Země</th>
+                                <th className="font-bold text-base-content">
+                                    <LocalizedText transKey="currency" />
+                                </th>
+                                <th className="font-bold text-base-content">
+                                    <LocalizedText transKey="code" />
+                                </th>
+                                <th className="font-bold text-base-content text-right">
+                                    <LocalizedText transKey="rate" />
+                                </th>
+                                <th className="font-bold text-base-content text-right">
+                                    <LocalizedText transKey="amount" />
+                                </th>
+                                <th className="font-bold text-base-content">
+                                    <LocalizedText transKey="country" />
+                                </th>
                             </tr>
                         </thead>
                         <tbody>

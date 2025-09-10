@@ -43,7 +43,7 @@ const ThemeSelect = () => {
             </div>
             <ul
                 tabIndex={0}
-                className="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl md:mt-12 max-sm:w-full"
+                className="dropdown-content bg-base-300 rounded-box z-1 w-52 p-2 shadow-2xl md:mt-52 max-sm:w-full"
             >
                 {THEMES.map((theme) => (
                     <li key={theme.value}>
@@ -51,7 +51,7 @@ const ThemeSelect = () => {
                             onChange={() => context.setTheme(theme.value)}
                             type="radio"
                             name="theme-dropdown"
-                            className="theme-controller w-full btn btn-sm btn-block btn-ghost justify-start"
+                            className="theme-controller w-full btn btn-sm  btn-ghost justify-start"
                             aria-label={theme.label}
                             value={theme.value}
                         />
