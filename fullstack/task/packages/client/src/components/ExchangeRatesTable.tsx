@@ -1,12 +1,11 @@
-import { usePaginatedExchangeRates } from '../hooks/useExchangeRates';
-import { usePagination } from '../hooks/usePagination';
+import { useContext } from 'react';
+import ExchangeRatesContext from '../context/ExchangeRatesContext';
 import LocalizedText from './LocalizedText';
 
 const ExchangeRatesTable = () => {
-    const { pagination } = usePagination();
-    const { exchangeRates, loading } = usePaginatedExchangeRates(pagination);
+    const context = useContext(ExchangeRatesContext.Context);
 
-    if (loading) {
+    if (context.loading) {
         return (
             <div className="min-h-screen flex items-center justify-center">
                 <div className="loading loading-spinner loading-lg" />
@@ -14,7 +13,7 @@ const ExchangeRatesTable = () => {
         );
     }
 
-    if (exchangeRates.length === 0) {
+    if (context.exchangeRates.length === 0) {
         return (
             <div className="text-center py-12">
                 <div className="text-base-content/40 text-lg">
@@ -49,7 +48,7 @@ const ExchangeRatesTable = () => {
                             </tr>
                         </thead>
                         <tbody>
-                            {exchangeRates.map((rate) => (
+                            {context.exchangeRates.map((rate) => (
                                 <tr key={rate.id} className="hover">
                                     <td className="font-medium">{rate.currency}</td>
                                     <td>
