@@ -1,4 +1,7 @@
+import { useContext } from 'react';
 import { PaginationInfo, PaginationInput } from '../hooks/useExchangeRates';
+import LocalizationContext from '../context/LocalizationContext';
+import LocalizedText from './LocalizedText';
 
 interface PaginationControlsProps {
     pagination: PaginationInfo | undefined;
@@ -13,6 +16,8 @@ const PaginationControls = ({
     onPageChange,
     loading = false,
 }: PaginationControlsProps) => {
+    const { getLocalizedString } = useContext(LocalizationContext.Context);
+
     if (!pagination) return null;
 
     const currentPage =
@@ -51,12 +56,17 @@ const PaginationControls = ({
     return (
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6 p-4 bg-base-100 rounded-lg">
             <div className="text-sm text-base-content/70">
-                Zobrazeno {pagination.count} z {pagination.totalCount} záznamů
+                {getLocalizedString('showingRecords', {
+                    count: pagination.count.toString(),
+                    total: pagination.totalCount.toString(),
+                })}
             </div>
 
             <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
-                    <span className="text-sm text-base-content/70">Záznamů na stránku:</span>
+                    <span className="text-sm text-base-content/70">
+                        <LocalizedText transKey="recordsPerPage" />
+                    </span>
                     <select
                         className="select select-sm select-bordered"
                         value={limit}
@@ -77,11 +87,14 @@ const PaginationControls = ({
                         onClick={goToPrevious}
                         disabled={currentPage <= 1 || loading}
                     >
-                        Předchozí
+                        <LocalizedText transKey="previous" />
                     </button>
 
                     <span className="text-sm px-3 py-2">
-                        Stránka {currentPage} z {totalPages}
+                        {getLocalizedString('pageOf', {
+                            current: currentPage.toString(),
+                            total: totalPages.toString(),
+                        })}
                     </span>
 
                     <button
@@ -90,7 +103,7 @@ const PaginationControls = ({
                         onClick={goToNext}
                         disabled={currentPage >= totalPages || loading}
                     >
-                        Další
+                        <LocalizedText transKey="next" />
                     </button>
                 </div>
             </div>

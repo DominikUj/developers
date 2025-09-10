@@ -1,5 +1,6 @@
 import { useContext } from 'react';
 import ThemeContext from '../context/ThemeContext';
+import LocalizationContext from '../context/LocalizationContext';
 
 const THEMES = [
     {

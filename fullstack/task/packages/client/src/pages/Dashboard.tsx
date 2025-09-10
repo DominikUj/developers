@@ -1,16 +1,15 @@
 import { useContext } from 'react';
 import ExchangeRatesTable from '../components/ExchangeRatesTable';
+import LanguageSelect from '../components/LanguageSelect';
 import LastDataUpdateIndicator from '../components/LastDataUpdateIndicator';
+import LocalizedText from '../components/LocalizedText';
 import PaginationControls from '../components/PaginationControls';
 import RefetchButton from '../components/RefetchButton';
 import ThemeSelect from '../components/ThemeSelect';
 import ExchangeRatesContext from '../context/ExchangeRatesContext';
-import LocalizationContext from '../context/LocalizationContext';
-import LocalizedText from '../components/LocalizedText';
 
 const Dashboard = () => {
     const context = useContext(ExchangeRatesContext.Context);
-    const localizationContext = useContext(LocalizationContext.Context);
 
     return (
         <div className="min-h-screen bg-base-200">
@@ -25,12 +24,13 @@ const Dashboard = () => {
                         </p>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-[60%_40%] gap-3 items-start sm:items-center w-full">
+                    <div className="grid grid-cols-1 md:grid-cols-[50%_50%] gap-3 items-start sm:items-center w-full">
                         <div className="flex justify-end items-center max-md:flex-col gap-4">
                             <LocalizedText transKey="theme" />
 
                             <ThemeSelect />
                         </div>
+                        <LanguageSelect />
                         <RefetchButton />
                         <LastDataUpdateIndicator />
                     </div>
