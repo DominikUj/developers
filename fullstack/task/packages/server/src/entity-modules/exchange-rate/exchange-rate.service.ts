@@ -1,70 +1,56 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import axios from 'axios';
-import { ExchangeRate } from '../../entities/exchange-rate.entity';
+import { Repository } from 'typeorm';
 import { PaginationInfo, PaginationInput } from '../../common/dto';
-import { exRateDailyRestResponseSchema } from './schemas/rate';
+import { Locale } from '../../common/dto/language.enum';
+import { ExchangeRate } from '../../entities/exchange-rate.entity';
+import { InternalLocale } from '../../utils/languageCodeMap';
 import { PaginatedExchangeRatesResponse } from './dto/paginated-exchange-rates.response';
+import { exRateDailyRestResponseSchema } from './schemas/rate';
 
 @Injectable()
 export class ExchangeRateService {
     private readonly CACHE_TTL_MINUTES = 5;
-    private readonly CNB_API_URL = 'https://api.cnb.cz/cnbapi/exrates/daily';
+    private readonly CNB_API_URL = process.env.CNB_API_URL || '';
 
     constructor(
         @InjectRepository(ExchangeRate)
         private readonly exchangeRateRepository: Repository<ExchangeRate>
     ) {}
 
-    public getExchangeRates = async (): Promise<ExchangeRate[]> => {
-        const cachedRates = await this.exchangeRateRepository.find({
+    public getExchangeRates = async (language: Locale): Promise<ExchangeRate[]> => {
+        await this.syncWithCNB();
+
+        return this.exchangeRateRepository.find({
+            where: { language },
             order: { currencyCode: 'ASC' },
         });
-
-        const now = new Date();
-        const isValidCache =
-            cachedRates.length > 0 &&
-            cachedRates.some((rate) => {
-                const ageInMinutes = (now.getTime() - rate.fetchedAt.getTime()) / (1000 * 60);
-                return ageInMinutes < this.CACHE_TTL_MINUTES;
-            });
-
-        if (isValidCache) {
-            console.log('Returning cached exchange rates');
-            return cachedRates;
-        }
-
-        const freshRates = await this.fetchFromCNBApi();
-
-        await this.exchangeRateRepository.clear();
-        await this.exchangeRateRepository.save(freshRates);
-
-        console.log('Returning fresh exchange rates from CNB API');
-        return freshRates;
     };
 
     public getPaginatedExchangeRates = async (
-        paginationInput: PaginationInput
+        paginationInput: PaginationInput,
+        locale: InternalLocale
     ): Promise<PaginatedExchangeRatesResponse> => {
         const { limit = 10, offset = 0 } = paginationInput;
 
-        await this.getExchangeRates();
-
-        const totalCount = await this.exchangeRateRepository.count();
+        await this.syncWithCNB();
 
         const items = await this.exchangeRateRepository.find({
             order: { currencyCode: 'ASC' },
             take: limit,
             skip: offset,
+            where: {
+                language: locale as Locale,
+            },
         });
 
         const paginationInfo: PaginationInfo = {
-            totalCount,
+            totalCount: items.length,
             count: items.length,
             offset,
             limit,
-            hasMore: offset + items.length < totalCount,
+            hasMore: offset + items.length < items.length,
         };
 
         return {
@@ -73,37 +59,70 @@ export class ExchangeRateService {
         };
     };
 
-    private async fetchFromCNBApi(): Promise<ExchangeRate[]> {
+    private async syncWithCNB() {
         try {
-            const response = await axios.get(this.CNB_API_URL);
-            const apiData = response.data;
-
-            if (!apiData.rates || !Array.isArray(apiData.rates)) {
-                throw new Error('Invalid API response format');
-            }
-
-            const rates: ExchangeRate[] = [];
-
-            const parseResult = exRateDailyRestResponseSchema.safeParse(apiData);
-            if (parseResult.error) {
-                console.error('Schema validation error:', parseResult.error);
-                throw new Error('Invalid API response schema');
-            }
-
-            const validatedRates = parseResult.data;
-            const fetchedAt = new Date();
-
-            validatedRates.rates.forEach(async (rate) => {
-                const _rate = await this.exchangeRateRepository.create({
-                    ...rate,
-                    fetchedAt,
-                    updatedAtUtc: fetchedAt.toISOString(),
-                    createdAtUtc: fetchedAt.toISOString(),
-                });
-                rates.push(_rate);
+            const cachedRates = await this.exchangeRateRepository.find({
+                order: { currencyCode: 'ASC' },
             });
 
-            return rates;
+            const now = new Date();
+            const isValidCache =
+                cachedRates.length > 0 &&
+                cachedRates.some((rate) => {
+                    const ageInMinutes = (now.getTime() - rate.fetchedAt.getTime()) / (1000 * 60);
+                    return ageInMinutes < this.CACHE_TTL_MINUTES;
+                });
+
+            if (isValidCache) {
+                return;
+            }
+
+            const [enResponse, csResponse] = await Promise.all([
+                axios.get(`${this.CNB_API_URL}?lang=EN`),
+                axios.get(`${this.CNB_API_URL}?lang=CZ`),
+            ]);
+
+            const rates: ExchangeRate[] = [];
+            const fetchedAt = new Date();
+
+            if (enResponse.data.rates && Array.isArray(enResponse.data.rates)) {
+                const parseResult = exRateDailyRestResponseSchema.safeParse(enResponse.data);
+                if (parseResult.success) {
+                    parseResult.data.rates.forEach((rate) => {
+                        const newRate = this.exchangeRateRepository.create({
+                            ...rate,
+                            language: Locale.EN,
+                            fetchedAt,
+                            updatedAtUtc: fetchedAt.toISOString(),
+                            createdAtUtc: fetchedAt.toISOString(),
+                        });
+                        rates.push(newRate);
+                    });
+                }
+            }
+
+            if (csResponse.data.rates && Array.isArray(csResponse.data.rates)) {
+                const parseResult = exRateDailyRestResponseSchema.safeParse(csResponse.data);
+                if (parseResult.success) {
+                    parseResult.data.rates.forEach((rate) => {
+                        const newRate = this.exchangeRateRepository.create({
+                            ...rate,
+                            language: Locale.CS,
+                            fetchedAt,
+                            updatedAtUtc: fetchedAt.toISOString(),
+                            createdAtUtc: fetchedAt.toISOString(),
+                        });
+                        rates.push(newRate);
+                    });
+                }
+            }
+
+            if (rates.length > 0) {
+                await this.exchangeRateRepository.clear();
+                await this.exchangeRateRepository.save(rates);
+            }
+
+            return;
         } catch (error) {
             console.error('Failed to fetch exchange rates from CNB API:', error);
             throw new Error('Failed to fetch exchange rates');

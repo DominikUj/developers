@@ -1,5 +1,7 @@
 import { useQuery } from '@apollo/client';
+import { useContext } from 'react';
 import { GET_EXCHANGE_RATES, GET_PAGINATED_EXCHANGE_RATES } from '../queries/exchangeRates';
+import LocalizationContext from '../context/LocalizationContext';
 
 export type ExchangeRate = {
     id: string;
@@ -24,28 +26,16 @@ export type PaginationInput = {
     offset?: number;
 };
 
-export const useExchangeRates = () => {
-    const { data, loading, error, refetch } = useQuery<{ exchangeRates: ExchangeRate[] }>(
-        GET_EXCHANGE_RATES
-    );
-
-    return {
-        exchangeRates: data?.exchangeRates || [],
-        loading,
-        error,
-        refetch,
-        fetchedAt: data?.exchangeRates[0]?.fetchedAt || null,
-    };
-};
-
 export const usePaginatedExchangeRates = (paginationInput?: PaginationInput) => {
+    const localization = useContext(LocalizationContext.Context);
+
     const { data, loading, error, refetch } = useQuery<{
         paginatedExchangeRates: {
             items: ExchangeRate[];
             pagination: PaginationInfo;
         };
     }>(GET_PAGINATED_EXCHANGE_RATES, {
-        variables: { pagination: paginationInput },
+        variables: { pagination: paginationInput, locale: localization.locale.toUpperCase() },
     });
 
     return {

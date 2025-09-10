@@ -1,14 +1,14 @@
-import { Field, Float, ObjectType, Int } from '@nestjs/graphql';
-import { IsString, IsNumber, IsDate, IsPositive } from 'class-validator';
+import { Field, Float, Int, ObjectType } from '@nestjs/graphql';
+import { IsDate, IsNumber, IsPositive, IsString } from 'class-validator';
 import { Column, Entity, Unique } from 'typeorm';
 import { EntityWithMeta } from '../common/entities/entity-with-meta';
+import { Locale } from '../common';
 import { VAR_CHAR } from './constants';
 
 @ObjectType()
 @Entity()
-@Unique(['currencyCode', 'validFor'])
+@Unique(['currencyCode', 'validFor', 'language'])
 export class ExchangeRate extends EntityWithMeta {
-
     @IsString()
     @Field(() => String)
     @Column({ ...VAR_CHAR })
@@ -44,4 +44,9 @@ export class ExchangeRate extends EntityWithMeta {
     @Field(() => Date)
     @Column({ type: 'timestamptz' })
     public fetchedAt!: Date;
+
+    @IsString()
+    @Field(() => Locale)
+    @Column({ type: 'char', length: 2, default: Locale.EN })
+    public language!: Locale;
 }

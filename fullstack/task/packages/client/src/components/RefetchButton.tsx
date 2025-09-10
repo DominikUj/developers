@@ -1,8 +1,8 @@
-import { useExchangeRates } from '../hooks/useExchangeRates';
+import { usePaginatedExchangeRates } from '../hooks/useExchangeRates';
 import LocalizedText from './LocalizedText';
 
 const RefetchButton = () => {
-    const { refetch, loading } = useExchangeRates();
+    const { refetch, loading } = usePaginatedExchangeRates();
 
     return (
         <button

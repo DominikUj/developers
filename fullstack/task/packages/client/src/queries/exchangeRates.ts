@@ -1,22 +1,8 @@
 import { gql } from '@apollo/client';
 
-export const GET_EXCHANGE_RATES = gql`
-    query GetExchangeRates {
-        exchangeRates {
-            id
-            currency
-            rate
-            currencyCode
-            amount
-            country
-            fetchedAt
-        }
-    }
-`;
-
 export const GET_PAGINATED_EXCHANGE_RATES = gql`
-    query GetPaginatedExchangeRates($pagination: PaginationInput) {
-        paginatedExchangeRates(pagination: $pagination) {
+    query GetPaginatedExchangeRates($pagination: PaginationInput, $locale: Locale) {
+        paginatedExchangeRates(pagination: $pagination, locale: $locale) {
             items {
                 id
                 currency

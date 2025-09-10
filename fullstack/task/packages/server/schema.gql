@@ -47,6 +47,13 @@ type ExchangeRate {
   rate: Float!
   validFor: DateTime!
   fetchedAt: DateTime!
+  language: Locale!
+}
+
+"""Supported languages for exchange rates"""
+enum Locale {
+  EN
+  CS
 }
 
 type PaginatedExchangeRatesResponse {
@@ -59,8 +66,7 @@ type PaginatedExchangeRatesResponse {
 
 type Query {
   exampleByName(name: String!): Example
-  exchangeRates: [ExchangeRate!]!
-  paginatedExchangeRates(pagination: PaginationInput): PaginatedExchangeRatesResponse!
+  paginatedExchangeRates(pagination: PaginationInput, locale: Locale): PaginatedExchangeRatesResponse!
 }
 
 input PaginationInput {

@@ -1,8 +1,8 @@
-import { useExchangeRates } from '../hooks/useExchangeRates';
+import { usePaginatedExchangeRates } from '../hooks/useExchangeRates';
 import LocalizedText from './LocalizedText';
 
 const LastDataUpdateIndicator = () => {
-    const { fetchedAt } = useExchangeRates();
+    const { fetchedAt } = usePaginatedExchangeRates();
 
     if (!fetchedAt) {
         return null;
